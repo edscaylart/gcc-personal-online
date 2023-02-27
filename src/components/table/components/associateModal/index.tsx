@@ -7,7 +7,7 @@ import { CloseClassContainer, Container } from "./styles";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutationQuery } from "../../../../services/hooks/useMutationQuery";
 import { useError } from "../../../../hooks/errors";
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { Modal, ModalContent } from "../../../radixModalComponent";
 import { getQuery } from "../../../../services/hooks/getQuery";
@@ -51,13 +51,21 @@ const AssociateModal = ({
   const [dataSource, setDataSource] = useState<innerClass>();
   const [loading, setLoading] = useState(true);
 
-  getQuery(`personal/web/available-classes/${data.code}`, [data.code], {
-    onSuccess: (res) => {
-      setDataSource({ ...data, ...res });
-      setLoading(false);
-    },
-    onError,
-  });
+  useEffect(() => {
+    console.log(hasCurrentLesson, data);
+  }, [hasCurrentLesson, data]);
+
+  const { refetch: refetchCurrent } = getQuery(
+    `personal/web/available-classes/${data.code}`,
+    [data.code],
+    {
+      onSuccess: (res) => {
+        setDataSource({ ...data, ...res });
+        setLoading(false);
+      },
+      onError,
+    }
+  );
 
   const {
     handleSubmit,
@@ -84,6 +92,9 @@ const AssociateModal = ({
         onSuccess: () => {
           toast.success("Aula Aberta");
           setClassOpened(true);
+          onClose();
+          refetch();
+          refetchCurrent();
         },
         onError,
       }
@@ -162,7 +173,7 @@ const AssociateModal = ({
         {(hasCurrentLesson && hasCurrentLesson === data.code) ||
         !hasCurrentLesson ? (
           <div className="buttons-container">
-            {data.class_taken || classOpened ? (
+            {data.open_web || classOpened ? (
               <Button
                 buttonStyle="Primary"
                 onClick={() => setOpen(true)}
@@ -324,7 +335,7 @@ const CloseClassModal = ({ onClose, data, refetch }: classCloseModalProps) => {
 
           <div className="buttons-container">
             {paymentCondition?.associates?.map((e, i: number) => (
-              <>
+              <Fragment key={i}>
                 <Button
                   buttonStyle="Primary"
                   onClick={() =>
@@ -337,7 +348,7 @@ const CloseClassModal = ({ onClose, data, refetch }: classCloseModalProps) => {
                 >
                   {e.associate_code}
                 </Button>
-              </>
+              </Fragment>
             ))}
 
             <Button
