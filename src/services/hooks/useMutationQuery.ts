@@ -4,7 +4,7 @@ import api from "../api";
 type methods = "post" | "put" | "patch" | "delete"
 
 export const useMutationQuery = (url: string, method: methods = "post") => {
-  const prepareMutation = (data) => {
+  const prepareMutation = (data: any) => {
     return api[method](url, data);
   };
 

@@ -1,6 +1,7 @@
 import React, { createContext, useContext } from "react";
 import { toast } from "react-toastify";
 import { useAuth } from "./auth";
+import { $WithChildren } from "../types";
 
 interface ErrorContextData {
   emitError(error: any, defaultMessage?: string): void;
@@ -8,7 +9,7 @@ interface ErrorContextData {
 
 const ErrorContext = createContext<ErrorContextData>({} as ErrorContextData);
 
-export const ErrorProvider: React.FC = ({ children }) => {
+export const ErrorProvider = ({ children }: $WithChildren) => {
   const { signOut } = useAuth();
 
   const emitError = (

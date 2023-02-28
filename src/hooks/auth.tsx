@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState } from "react";
 import { toast } from "react-toastify";
 import { User } from "../models/user";
 import { api } from "../services/api";
+import { $WithChildren } from "../types";
 
 interface AuthState {
   token: string;
@@ -24,15 +25,13 @@ export const AuthContext = createContext<AuthContextData>(
   {} as AuthContextData
 );
 
-export const AuthProvider: React.FC = ({ children }) => {
+export const AuthProvider = ({ children }: $WithChildren) => {
   const [data, setData] = useState<AuthState>(() => {
     const token = localStorage.getItem("gcc-personal-online/token");
+    const storedUser = localStorage.getItem("gcc-personal-online/user");
 
-    const associate: User = JSON.parse(
-      localStorage.getItem("gcc-personal-online/user")
-    );
-
-    if (associate && token) {
+    if (storedUser && token) {
+      const associate: User = JSON.parse(storedUser);
       (api as any).defaults.headers.Authorization = `Bearer ${token}`;
       return { token, associate };
     }

@@ -15,6 +15,7 @@ export interface classType extends BaseType {
 
 export interface innerClass extends classType {
   hasLessonOpen: boolean;
+  lesson_code: number;
   students: {
     class_code: number;
     associate_code: number;
