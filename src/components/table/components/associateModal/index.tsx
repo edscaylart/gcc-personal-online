@@ -83,6 +83,17 @@ const AssociateModal = ({
     `/personal/web/available-classes/${data?.code}/open-lesson`
   );
 
+  const sortedStudents = useMemo(() => {
+    return dataSource?.students?.sort((a,b) => {
+      if (a.checkin_today && !b.checkin_today) return -1;
+      if (!a.checkin_today && b.checkin_today) return 1;
+      return 0;
+    })?.filter(student => {
+      if (!!data.status) return student.checkin_today;
+      return true;
+    });
+  }, [dataSource])
+
   const onSubmitOpenClass = (data: modalInput) => {
     onOpenClass(
       {
@@ -106,6 +117,7 @@ const AssociateModal = ({
       <Modal open={open} onOpenChange={() => setOpen(!open)}>
         <ModalContent title="">
           <CloseClassModal
+            lessonCode={dataSource?.lesson_code!}
             onClose={() => setOpen(false)}
             refetch={() => {
               refetch();
@@ -139,11 +151,12 @@ const AssociateModal = ({
           {loading ? (
             <AiOutlineLoading3Quarters />
           ) : (
-            dataSource?.students?.map((e, i: number) => (
+            sortedStudents?.map((e, i: number) => (
               <li key={i}>
                 <CheckBoxComponent
                   id={"associate" + i}
                   maxWidth={30}
+                  readonly={!!data.status || hasCurrentLesson}
                   onCheckedChange={(value) => {
                     const associates = watch("associates");
                     if (value) {
@@ -204,8 +217,9 @@ const AssociateModal = ({
 };
 
 interface classCloseModalProps {
-  onClose(): void;
   data?: any;
+  lessonCode: number;
+  onClose(): void;
   refetch(): void;
 }
 
@@ -225,16 +239,12 @@ interface closureInputs {
   associate_code_to_charge: number | null | undefined;
 }
 
-const CloseClassModal = ({ onClose, data, refetch }: classCloseModalProps) => {
+const CloseClassModal = ({ onClose, lessonCode, data, refetch }: classCloseModalProps) => {
   const { emitError: onError } = useError();
   const [states, setState] = useState<modalState>("payment");
   const [paymentCondition, setPaymentCondition] = useState<paymentC>();
 
   const { handleSubmit, setValue, watch, getValues } = useForm<closureInputs>();
-
-  useEffect(() => {
-    setValue("lesson_code", data.code);
-  }, []);
 
   getQuery(
     `personal/web/available-classes/${data?.code}/charge-conditions/`,
@@ -257,6 +267,7 @@ const CloseClassModal = ({ onClose, data, refetch }: classCloseModalProps) => {
     split = false,
     associate_code: number | null = null
   ) => {
+    setValue("lesson_code", lessonCode);
     setValue("payment_plan_code", value);
     setValue("split", split);
     setValue("associate_code_to_charge", associate_code);

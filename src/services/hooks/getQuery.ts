@@ -13,6 +13,7 @@ export const getQuery = (
 ) => {
   return useQuery(actions, () => get(url), {
     initialData: false,
+    // @ts-ignore
     refetchOnWindowFocus: false,
     ...options,
   });

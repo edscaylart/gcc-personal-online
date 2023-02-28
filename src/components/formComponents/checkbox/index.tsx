@@ -44,7 +44,7 @@ const CheckBoxComponent = ({
       readonly={readonly}
     >
       {label && <label htmlFor={id}>{label} </label>}
-      {!reloadBox && (
+      {!reloadBox && !readonly ? (
         <CheckboxRoot
           id={id}
           defaultChecked={checked}
@@ -54,7 +54,7 @@ const CheckBoxComponent = ({
             <GoCheck />
           </CheckboxIndication>
         </CheckboxRoot>
-      )}
+      ) : null}
       {error && <p>{error}</p>}
     </Container>
   );

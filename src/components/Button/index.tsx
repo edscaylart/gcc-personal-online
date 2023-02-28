@@ -43,7 +43,8 @@ const Button: React.FC<ButtonProps> = ({
     if (event.key !== keyCode) return;
     event.preventDefault();
     if (event.key === keyCode) {
-      buttonRef.current?.click?.();
+      const btn = buttonRef.current as unknown as any;
+      btn?.click?.();
     }
   };
 

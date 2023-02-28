@@ -5,7 +5,7 @@ const buttonAnimation = keyframes`
 from{
     top:-50vh;
     transform: rotateX(90deg);
-    opacity:0;    
+    opacity:0;
   }
   to{
     top:0;
@@ -184,7 +184,7 @@ export const ButtonContainer = styled.button.attrs<ButtonProps>(({ type }) => ({
   transition: 0.3s;
   animation: ${(props) => props.animation && buttonAnimation} 0.6s ease;
   padding: ${(props) =>
-    props.circle || props.square ? "9px 13px" : buttonSizes[props.size]};
+    props.circle || props.square ? "9px 13px" : buttonSizes[props.size ?? 'Medium']};
   border-radius: ${(props) => (props.circle ? "99px" : "8px")};
   ${({ theme }) => theme.fonts.mulish.body_bold};
   ${(props) => buttonStyles[props.buttonStyle]};
