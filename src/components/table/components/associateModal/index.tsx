@@ -84,15 +84,17 @@ const AssociateModal = ({
   );
 
   const sortedStudents = useMemo(() => {
-    return dataSource?.students?.sort((a,b) => {
-      if (a.checkin_today && !b.checkin_today) return -1;
-      if (!a.checkin_today && b.checkin_today) return 1;
-      return 0;
-    })?.filter(student => {
-      if (!!data.status) return student.checkin_today;
-      return true;
-    });
-  }, [dataSource])
+    return dataSource?.students
+      ?.sort((a, b) => {
+        if (a.checkin_today && !b.checkin_today) return -1;
+        if (!a.checkin_today && b.checkin_today) return 1;
+        return 0;
+      })
+      ?.filter((student) => {
+        if (!!data.status) return student.checkin_today;
+        return true;
+      });
+  }, [dataSource]);
 
   const onSubmitOpenClass = (data: modalInput) => {
     onOpenClass(
@@ -111,6 +113,37 @@ const AssociateModal = ({
       }
     );
   };
+
+  const buttons = useMemo(() => {
+    if (hasCurrentLesson && hasCurrentLesson === data.code)
+      return (
+        <Button
+          buttonStyle="Primary"
+          onClick={() => setOpen(true)}
+          loading={isLoading}
+        >
+          Fechar Aula
+        </Button>
+      );
+    if (!hasCurrentLesson && !data?.payed)
+      return (
+        <Button
+          buttonStyle="Primary"
+          onClick={handleSubmit(onSubmitOpenClass)}
+          loading={isLoading}
+        >
+          Abrir Aulas
+        </Button>
+      );
+
+    if (data?.payed) return <p className="error-message">Aula Encerrada</p>;
+
+    return (
+      <p className="error-message">
+        Não é possível abrir esta aula, pois já existe uma em aberto.
+      </p>
+    );
+  }, [hasCurrentLesson, data, isLoading, classOpened]);
 
   return (
     <>
@@ -182,35 +215,7 @@ const AssociateModal = ({
             ))
           )}
         </ul>
-
-        {(hasCurrentLesson && hasCurrentLesson === data.code) ||
-        !hasCurrentLesson ? (
-          <div className="buttons-container">
-            {data.open_web || classOpened ? (
-              <Button
-                buttonStyle="Primary"
-                onClick={() => setOpen(true)}
-                loading={isLoading}
-              >
-                Fechar Aula
-              </Button>
-            ) : (
-              <Button
-                buttonStyle="Primary"
-                onClick={handleSubmit(onSubmitOpenClass)}
-                loading={isLoading}
-              >
-                Abrir Aulas
-              </Button>
-            )}
-          </div>
-        ) : (
-          <div className="buttons-container">
-            <p className="error-message">
-              Não é possível abrir esta aula, pois já existe uma em aberto.
-            </p>
-          </div>
-        )}
+        <div className="buttons-container">{buttons}</div>
       </Container>
     </>
   );
@@ -239,7 +244,12 @@ interface closureInputs {
   associate_code_to_charge: number | null | undefined;
 }
 
-const CloseClassModal = ({ onClose, lessonCode, data, refetch }: classCloseModalProps) => {
+const CloseClassModal = ({
+  onClose,
+  lessonCode,
+  data,
+  refetch,
+}: classCloseModalProps) => {
   const { emitError: onError } = useError();
   const [states, setState] = useState<modalState>("payment");
   const [paymentCondition, setPaymentCondition] = useState<paymentC>();
