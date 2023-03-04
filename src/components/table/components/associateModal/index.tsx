@@ -171,9 +171,11 @@ const AssociateModal = ({
           )}
           <p>Turma: {data?.code}</p>
           <p>Descrição: {data?.description}</p>
-          <p>
-            Data: <DateIndicator date={data?.open_at} />
-          </p>
+          {data?.open_at ? (
+            <p>
+              Data: <DateIndicator date={data?.open_at} />
+            </p>
+          ) : null}
         </header>
 
         {errors.associates?.message && (
@@ -254,14 +256,13 @@ const CloseClassModal = ({
   const [states, setState] = useState<modalState>("payment");
   const [paymentCondition, setPaymentCondition] = useState<paymentC>();
 
-  const { handleSubmit, setValue, watch, getValues } = useForm<closureInputs>();
+  const { setValue, watch, getValues } = useForm<closureInputs>();
 
   getQuery(
     `personal/web/available-classes/${data?.code}/charge-conditions/`,
     [data?.code, "charge-condition"],
     {
       onSuccess: (res) => {
-        console.log(res);
         setPaymentCondition(res);
       },
       onError,
@@ -282,7 +283,7 @@ const CloseClassModal = ({
     setValue("split", split);
     setValue("associate_code_to_charge", associate_code);
 
-    if (paymentCondition?.canSplitCharge && states === "split") {
+    if (paymentCondition?.canSplitCharge && !associate_code && !split) {
       setState("split");
       return;
     }
@@ -366,6 +367,7 @@ const CloseClassModal = ({
                       e?.associate_code
                     )
                   }
+                  loading={isLoading}
                 >
                   {e.associate_code}
                 </Button>
@@ -375,6 +377,7 @@ const CloseClassModal = ({
             <Button
               buttonStyle="Primary"
               onClick={() => onCloseClass(watch("payment_plan_code"), true)}
+              loading={isLoading}
             >
               Dividir Fatura
             </Button>

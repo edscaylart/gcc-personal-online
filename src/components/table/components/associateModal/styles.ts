@@ -12,6 +12,10 @@ export const Container = styled.div`
     p {
       ${({ theme }) => theme.fonts.mulish.body_regular};
       color: ${({ theme }) => theme.colors.cold_grey_800};
+
+      span {
+        ${({ theme }) => theme.fonts.mulish.body_regular};
+      }
     }
   }
 
